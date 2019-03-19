@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+		<title>智能铁鞋定位管理系统</title>
+		<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css" />
+		<link rel="stylesheet" type="text/css" href="css/antd.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/public.css" />
+		<script src="js/jquery-1.11.2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=039d9eb6679bf645545be910b8701a69&plugin=AMap.Geocoder"></script>
+		<script src="js/common.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div class="header-left">
+			<div class="header-left-name">
+				<img src="img/logo.png" width="25" height="25" style="vertical-align: middle;" />
+				<span>智能铁鞋定位管理系统</span>
+			</div>
+			<div class="header-right">admin<i id="quit" class="anticon anticon-poweroff" style="padding: 5px 0px 5px 15px; cursor: pointer;"><svg viewBox="64 64 896 896" class="" data-icon="poweroff" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M705.6 124.9a8 8 0 0 0-11.6 7.2v64.2c0 5.5 2.9 10.6 7.5 13.6a352.2 352.2 0 0 1 62.2 49.8c32.7 32.8 58.4 70.9 76.3 113.3a355 355 0 0 1 27.9 138.7c0 48.1-9.4 94.8-27.9 138.7a355.92 355.92 0 0 1-76.3 113.3 353.06 353.06 0 0 1-113.2 76.4c-43.8 18.6-90.5 28-138.5 28s-94.7-9.4-138.5-28a353.06 353.06 0 0 1-113.2-76.4A355.92 355.92 0 0 1 184 650.4a355 355 0 0 1-27.9-138.7c0-48.1 9.4-94.8 27.9-138.7 17.9-42.4 43.6-80.5 76.3-113.3 19-19 39.8-35.6 62.2-49.8 4.7-2.9 7.5-8.1 7.5-13.6V132c0-6-6.3-9.8-11.6-7.2C178.5 195.2 82 339.3 80 506.3 77.2 745.1 272.5 943.5 511.2 944c239 .5 432.8-193.3 432.8-432.4 0-169.2-97-315.7-238.4-386.7zM480 560h64c4.4 0 8-3.6 8-8V88c0-4.4-3.6-8-8-8h-64c-4.4 0-8 3.6-8 8v464c0 4.4 3.6 8 8 8z"></path></svg></i></div>
+		</div>
+		<div id="container" style="top: 50px;"></div>
+		<div class="close-icon">
+			<i class="anticon anticon-double-right"><svg viewBox="64 64 896 896" class="" data-icon="double-right" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M533.2 492.3L277.9 166.1c-3-3.9-7.7-6.1-12.6-6.1H188c-6.7 0-10.4 7.7-6.3 12.9L447.1 512 181.7 851.1A7.98 7.98 0 0 0 188 864h77.3c4.9 0 9.6-2.3 12.6-6.1l255.3-326.1c9.1-11.7 9.1-27.9 0-39.5zm304 0L581.9 166.1c-3-3.9-7.7-6.1-12.6-6.1H492c-6.7 0-10.4 7.7-6.3 12.9L751.1 512 485.7 851.1A7.98 7.98 0 0 0 492 864h77.3c4.9 0 9.6-2.3 12.6-6.1l255.3-326.1c9.1-11.7 9.1-27.9 0-39.5z"></path></svg></i>
+		</div>
+		<div class="show-icon">
+			<i class="anticon anticon-double-left"><svg viewBox="64 64 896 896" class="" data-icon="double-left" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M272.9 512l265.4-339.1c4.1-5.2.4-12.9-6.3-12.9h-77.3c-4.9 0-9.6 2.3-12.6 6.1L186.8 492.3a31.99 31.99 0 0 0 0 39.5l255.3 326.1c3 3.9 7.7 6.1 12.6 6.1H532c6.7 0 10.4-7.7 6.3-12.9L272.9 512zm304 0l265.4-339.1c4.1-5.2.4-12.9-6.3-12.9h-77.3c-4.9 0-9.6 2.3-12.6 6.1L490.8 492.3a31.99 31.99 0 0 0 0 39.5l255.3 326.1c3 3.9 7.7 6.1 12.6 6.1H836c6.7 0 10.4-7.7 6.3-12.9L576.9 512z"></path></svg></i>
+		</div>
+		<div class="infoList">
+			<div>
+				<span class="ant-input-search ant-input-search-enter-button ant-input-affix-wrapper"><input placeholder="输入名称或IMEI" class="ant-input" type="text"><span class="ant-input-suffix"><button id="search" type="button" class="ant-btn ant-input-search-button ant-btn-primary"><span>搜 索</span></button</span>
+				</span>
+			</div>
+			<div style="margin: 5px 0px; background-color: rgb(197, 197, 197); height: 0px; width: 100%;"></div>
+			<div class="btn-group" role="group" style="width: 100%; margin: 0px; background-color: rgb(232, 232, 232);"><button id="all" type="button" class="btn btn-default btn-sm btn-tab-activity" style="width: 33.33%;">全部(10)</button><button id="onLine" type="button" class="btn btn-default btn-sm" style="width: 33.33%;">在线(0)</button><button id="offLine" type="button" class="btn btn-default btn-sm" style="width: 33.33%;">离线(10)</button></div>
+			<div class="getList" id="getList">
+			</div>
+		</div>
+		<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+		<script type="text/javascript">
+			//创建地图
+			var map = new AMap.Map('container', {
+				zoom: 9
+			});
+
+			var lnglatXY;
+
+			//构建数据源，数据项本身没有格式要求，但需要支持getDataId和getPosition
+			var arr = [{
+				id: '1',
+				position: [120.618139, 31.300408],
+				desc: '数据_1'
+			}, {
+				id: '2',
+				position: [120.616897, 31.300689],
+				desc: '数据_2'
+			}, {
+				id: '3',
+				position: [120.616228, 31.301633],
+				desc: '数据_3'
+			}, {
+				id: '4',
+				position: [120.616237, 31.30232],
+				desc: '数据_4'
+			}, {
+				id: '5',
+				position: [120.616188, 31.302815],
+				desc: '数据_5'
+			}, {
+				id: '6',
+				position: [120.61567, 31.302494],
+				desc: '数据_6'
+			}, {
+				id: '7',
+				position: [120.615276, 31.301696],
+				desc: '数据_7'
+			}, {
+				id: '8',
+				position: [120.615171, 31.300674],
+				desc: '数据_8'
+			}];
+
+			//加载MarkerList，loadUI的路径参数为模块名中 'ui/' 之后的部分    
+			AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
+				//启动页面
+				initPage(MarkerList);
+			});
+
+			function initPage(MarkerList) {
+				//创建一个实例
+				var markerList = new MarkerList({
+					//关联的map对象
+					map: map,
+					//列表的dom容器的节点或者id, 用于放置getListElement返回的内容
+					listContainer: 'getList',
+					//选中状态（通过点击列表或者marker）时在Marker和列表节点上添加的class，可以借此编写css控制选中时的展示效果
+					selectedClassNames: 'my-active',
+					//需要监听的列表节点事件
+					listElementEvents: ['click', 'mouseenter', 'mouseleave'],
+					//需要监听的marker事件
+					markerEvents: ['click', 'mouseover', 'mouseout'],
+					getDataId: function(dataItem, index) {
+						//返回数据项的Id
+						return dataItem.id;
+					},
+					getPosition: function(dataItem) {
+						//返回数据项的经纬度，AMap.LngLat实例或者经纬度数组
+						return dataItem.position;
+					},
+					getMarker: function(dataItem, context, recycledMarker) {
+						var content = '标注: ' + (context.index + 1) + '',
+							label = {
+								offset: new AMap.Pixel(16, 18),
+								//								content: content
+							};
+
+						if(recycledMarker) {
+							//存在可回收利用的marker,直接setLabel返回
+							recycledMarker.setLabel(label);
+							return recycledMarker;
+						}
+						//返回一个新的Marker
+						return new AMap.Marker({
+							label: label
+						});
+					},
+					getInfoWindow: function(dataItem, context, recycledInfoWindow) {
+						var tpl = '<p><%- dataItem.id %>：<%- dataItem.desc %><p>';
+						//MarkerList.utils.template支持underscore语法的模板
+						var content = MarkerList.utils.template(tpl, {
+							dataItem: dataItem,
+							dataIndex: context.index
+						});
+						if(recycledInfoWindow) {
+							//存在可回收利用的infoWindow, 直接setContent返回
+							recycledInfoWindow.setContent(content);
+							return recycledInfoWindow;
+						}
+						//返回一个新的InfoWindow
+						return new AMap.InfoWindow({
+							offset: new AMap.Pixel(0, -23),
+							content: content
+						});
+					},
+					getListElement: function(dataItem, context, recycledListElement) {
+						var tpl = '<p><%- dataItem.id %>：<%- dataItem.desc %><p>';
+						var content = MarkerList.utils.template(tpl, {
+							dataItem: dataItem,
+							dataIndex: context.index
+						});
+						if(recycledListElement) {
+							//存在可回收利用的listElement, 直接更新内容返回
+							recycledListElement.innerHTML = content;
+							return recycledListElement;
+						}
+						//返回一段html，MarkerList将利用此html构建一个新的dom节点
+						return '<div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + content + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div>';
+					}
+				});
+
+				//监听选中改变
+				markerList.on('selectedChanged', function(event, info) {
+					console.log(info)
+				});
+
+				//监听Marker和ListElement上的点击，详见markerEvents，listElementEvents
+				markerList.on('markerClick listElementClick', function(event, record) {});
+
+				//绘制数据源，Let's go!
+				markerList.render(arr);
+
+				//全部
+				$('#all').on('click', function() {
+					$('.getList').html('');
+					$(this).addClass('btn-tab-activity');
+					$('#onLine').removeClass('btn-tab-activity');
+					$('#offLine').removeClass('btn-tab-activity');
+					arr = [{
+						id: 'A',
+						position: [120.618139, 31.300408],
+						desc: '数据_1'
+					}, {
+						id: 'B',
+						position: [120.616897, 31.300689],
+						desc: '数据_2'
+					}, {
+						id: 'C',
+						position: [120.616228, 31.301633],
+						desc: '数据_3'
+					}, {
+						id: 'D',
+						position: [120.616237, 31.30232],
+						desc: '数据_3'
+					}, {
+						id: 'E',
+						position: [120.616188, 31.302815],
+						desc: '数据_3'
+					}, {
+						id: 'F',
+						position: [120.61567, 31.302494],
+						desc: '数据_3'
+					}, {
+						id: 'g',
+						position: [120.615276, 31.301696],
+						desc: '数据_3'
+					}, {
+						id: 'H',
+						position: [120.615171, 31.300674],
+						desc: '数据_3'
+					}]
+					//				setSpot();
+					setListAddress();
+					markerList.render(arr);
+				})
+
+				//在线
+				$('#onLine').on('click', function() {
+					$('.getList').html('');
+					$(this).addClass('btn-tab-activity');
+					$('#all').removeClass('btn-tab-activity');
+					$('#offLine').removeClass('btn-tab-activity');
+					arr = [{
+						id: 'A',
+						position: [120.618139, 31.300408],
+						desc: '数据_1'
+					}, {
+						id: 'B',
+						position: [120.616897, 31.300689],
+						desc: '数据_2'
+					}, {
+						id: 'C',
+						position: [120.616228, 31.301633],
+						desc: '数据_3'
+					}, {
+						id: 'H',
+						position: [120.615171, 31.300674],
+						desc: '数据_3'
+					}]
+					//				setSpot();
+					setListAddress();
+					markerList.render(arr);
+				})
+
+				//离线
+				$('#offLine').on('click', function() {
+					$('.getList').html('');
+					$(this).addClass('btn-tab-activity');
+					$('#onLine').removeClass('btn-tab-activity');
+					$('#all').removeClass('btn-tab-activity');
+					arr = [{
+						id: 'A',
+						position: [120.618139, 31.300408],
+						desc: '数据_1'
+					}, {
+						id: 'B',
+						position: [120.616897, 31.300689],
+						desc: '数据_2'
+					}, {
+						id: 'H',
+						position: [120.615171, 31.300674],
+						desc: '数据_3'
+					}]
+
+					//				setSpot();
+					setListAddress();
+					markerList.render(arr);
+				})
+
+				//搜索
+				$('#search').on('click', function() {
+					//				$('.getList').html('');
+					//				$('#all').addClass('btn-tab-activity');
+					//				$('#onLine').removeClass('btn-tab-activity');
+					//				$('#offLine').removeClass('btn-tab-activity');
+					//				arr = [
+					//					[120.616237, 31.30232],
+					//					[120.616188, 31.302815],
+					//					[120.615171, 31.300674]
+					//				]
+					//				setSpot();
+					//				setListAddress();
+
+				})
+			}
+
+			$(function() {
+				//				setListAddress();
+			})
+
+			//			var lnglatXY = []; //坐标
+			//			var address; //详细地址
+			//
+			//			var map = new AMap.Map("container", {
+			//				zoom: 9
+			//			});
+			//
+			//			var arr = [
+			//				[120.618139, 31.300408],
+			//				[120.616897, 31.300689],
+			//				[120.616228, 31.301633],
+			//				[120.616237, 31.30232],
+			//				[120.616188, 31.302815],
+			//				[120.61567, 31.302494],
+			//				[120.615276, 31.301696],
+			//				[120.615171, 31.300674]
+			//			]
+			//
+			//			//将点标注在地图上
+			//			function setSpot() {
+			//				var infoWindow = new AMap.InfoWindow({
+			//					offset: new AMap.Pixel(0, -30)
+			//				});
+			//				for(var i = 0, marker; i < arr.length; i++) {
+			//					var marker = new AMap.Marker({
+			//						position: arr[i],
+			//						map: map
+			//					});
+			//					lnglatXY = arr[i];
+			//				}
+			//			}
+			//
+			//将列表中的经纬度转换为详细地址
+			function setListAddress() {
+				for(var i = 0; i < arr.length; i++) {
+					lnglatXY = arr[i].position;
+					regeocoder();
+				}
+			}
+			//
+			//解析地址
+			function regeocoder() {
+				var geocoder = new AMap.Geocoder({
+					radius: 1000,
+					extensions: "all"
+				});
+				geocoder.getAddress(lnglatXY, function(status, result) {
+					if(status === 'complete' && result.info === 'OK') {
+						//						geocoder_CallBack(result);
+						$('#getList').append('<li><div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + result.regeocode.formattedAddress + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div></li>')
+					}
+				});
+				//				var marker = new AMap.Marker({ //加点
+				//					map: map,
+				//					position: lnglatXY
+				//				});
+				//				map.setFitView();
+				//				//点击坐标时
+				//				marker.on('click', function(e) {
+				//					openInfo(e);
+				//				});
+			}
+			//
+			//返回地址
+			//			function geocoder_CallBack(data) {
+			//				address = data.regeocode.formattedAddress; //返回地址描述
+			//				$('.getList').append('<div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + address + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div>')
+			//			}
+
+			//在指定位置打开信息窗体
+			//			function openInfo(e) {
+			//				//构建信息窗体中显示的内容
+			//				var info = [];
+			//				info.push(address);
+			//
+			//				infoWindow = new AMap.InfoWindow({
+			//					offset: new AMap.Pixel(0, -30),
+			//					content: info.join("") //使用默认信息窗体框样式，显示信息内容
+			//				});
+			//				infoWindow.open(map, e.target.getPosition(), map.getCenter());
+			//			}
+
+			//隐藏
+			$('.close-icon').on('click', function() {
+				$('.infoList').hide();
+				$(this).hide();
+				$('.show-icon').show();
+			})
+			//显示
+			$('.show-icon').on('click', function() {
+				$('.infoList').show();
+				$(this).hide();
+				$('.close-icon').show();
+			})
+			//退出登录
+			$('#quit').on('click', function() {
+				window.location.href = 'login.html';
+			})
+			//
+			//			//点击列表打开指定位置
+			//			$(document).on('click', '.info', function() {
+			//
+			//			})
+			//
+		</script>
+	</body>
+
+</html>
