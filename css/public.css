@@ -12,9 +12,11 @@ ul {
 	margin: 0;
 	margin-bottom: 0 !important;
 }
+
 li {
 	list-style: none;
 }
+
 .header .layui-nav-child {
 	z-index: 99999;
 	top: 60px;
@@ -149,7 +151,7 @@ li {
 	bottom: 0px;
 	right: 0;
 	z-index: 1;
-	padding: 10px;
+	padding: 10px 0;
 	background-color: rgb(255, 255, 255);
 	border-radius: 4px;
 	box-shadow: rgb(17, 34, 51) 0px 0px 7px 1px;
@@ -186,7 +188,7 @@ li {
 	cursor: pointer;
 	position: absolute;
 	top: 122px;
-	right: 350px;
+	right: 357px;
 	padding: 3px;
 	border-radius: 4px;
 	z-index: 2;
@@ -214,6 +216,32 @@ li {
 	border-bottom: 1px dashed #E1E1E1;
 	cursor: pointer;
 	padding: 10px 0;
+}
+
+.windowInfo {}
+
+.infoWindow-name {
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.infoWindow-result {
+	font-size: 20px;
+	color: #1268ef;
+}
+
+.infoWindow-other {
+	font-size: 14px;
+}
+
+.infoWindow-other img {
+	margin-bottom: 4px;
+	height: 22px;
+}
+
+.infoWindow-other img {
+	margin-bottom: 4px;
+	height: 22px;
 }
 
 .info:hover {

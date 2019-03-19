@@ -11,7 +11,6 @@
 		<link rel="stylesheet" type="text/css" href="css/public.css" />
 		<script src="js/jquery-1.11.2.min.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.6&key=039d9eb6679bf645545be910b8701a69&plugin=AMap.Geocoder"></script>
-		<script src="js/common.js" type="text/javascript" charset="utf-8"></script>
 	</head>
 
 	<body>
@@ -50,38 +49,134 @@
 
 			//构建数据源，数据项本身没有格式要求，但需要支持getDataId和getPosition
 			var arr = [{
-				id: '1',
+				bootid: '363620181216243',
+				bootname: '板鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 0,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 1,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.618139, 31.300408],
-				desc: '数据_1'
 			}, {
-				id: '2',
+				bootid: '363620181216243',
+				bootname: '球鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 1,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 2,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.616897, 31.300689],
-				desc: '数据_2'
 			}, {
-				id: '3',
+				bootid: '363620181216243',
+				bootname: '草鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 0,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 3,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.616228, 31.301633],
-				desc: '数据_3'
 			}, {
-				id: '4',
+				bootid: '363620181216243',
+				bootname: '拖鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 1,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 5,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.616237, 31.30232],
-				desc: '数据_4'
 			}, {
-				id: '5',
+				bootid: '363620181216243',
+				bootname: '高跟鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 1,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 2,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.616188, 31.302815],
-				desc: '数据_5'
 			}, {
-				id: '6',
+				bootid: '3636201812162431',
+				bootname: '增高鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 0,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 4,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.61567, 31.302494],
-				desc: '数据_6'
 			}, {
-				id: '7',
+				bootid: '3636201812162431',
+				bootname: '布鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 1,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 1,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.615276, 31.301696],
-				desc: '数据_7'
 			}, {
-				id: '8',
+				bootid: '1363620181216243',
+				bootname: '帆布鞋',
+				stationid: '铁鞋所在站id',
+				bootdeviceid: '铁鞋设备id',
+				onlinestate: 1,
+				uploadmode: 'WIFI',
+				batteryvoumn: '95%',
+				signalintensity: 3,
+				updatetime: '2019-03-17 17:17:53',
 				position: [120.615171, 31.300674],
-				desc: '数据_8'
 			}];
+			transform(arr);
+
+			function transform(arr) {
+				$.each(arr, function(n, value) {
+					if(value.signalintensity == 1) {
+						value.signalintensity = 'img/Signal-1.png'
+					}
+					if(value.signalintensity == 2) {
+						value.signalintensity = 'img/Signal-2.png'
+					}
+					if(value.signalintensity == 3) {
+						value.signalintensity = 'img/Signal-3.png'
+					}
+					if(value.signalintensity == 4) {
+						value.signalintensity = 'img/Signal-4.png'
+					}
+					if(value.signalintensity == 5) {
+						value.signalintensity = 'img/Signal-5.png'
+					}
+
+					if(value.onlinestate == 0) {
+						value.onlinestate = '离线';
+					}
+
+					if(value.onlinestate == 1) {
+						value.onlinestate = '在线';
+					}
+
+					var geocoder = new AMap.Geocoder({
+						radius: 1000,
+						extensions: "all"
+					});
+					geocoder.getAddress(value.position, function(status, result) {
+						if(status === 'complete' && result.info === 'OK') {
+							value.address = result.regeocode.formattedAddress;
+						}
+					});
+
+				});
+			}
 
 			//加载MarkerList，loadUI的路径参数为模块名中 'ui/' 之后的部分    
 			AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
@@ -128,7 +223,7 @@
 						});
 					},
 					getInfoWindow: function(dataItem, context, recycledInfoWindow) {
-						var tpl = '<p><%- dataItem.id %>：<%- dataItem.desc %><p>';
+						var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.bootid %>）</span></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
 						//MarkerList.utils.template支持underscore语法的模板
 						var content = MarkerList.utils.template(tpl, {
 							dataItem: dataItem,
@@ -146,7 +241,8 @@
 						});
 					},
 					getListElement: function(dataItem, context, recycledListElement) {
-						var tpl = '<p><%- dataItem.id %>：<%- dataItem.desc %><p>';
+						console.log(dataItem);
+						var tpl = '<div class="info"><div class="infoTitle"><span class="bootname"><%- dataItem.bootname %></span><span class="bootId">（<%- dataItem.bootid %>）</span></div><div class="result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
 						var content = MarkerList.utils.template(tpl, {
 							dataItem: dataItem,
 							dataIndex: context.index
@@ -157,220 +253,240 @@
 							return recycledListElement;
 						}
 						//返回一段html，MarkerList将利用此html构建一个新的dom节点
-						return '<div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + content + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div>';
+						return content;
 					}
 				});
 
 				//监听选中改变
-				markerList.on('selectedChanged', function(event, info) {
-					console.log(info)
-				});
+				markerList.on('selectedChanged', function(event, info) {});
 
 				//监听Marker和ListElement上的点击，详见markerEvents，listElementEvents
 				markerList.on('markerClick listElementClick', function(event, record) {});
 
-				//绘制数据源，Let's go!
+				//绘制数据源
 				markerList.render(arr);
 
 				//全部
 				$('#all').on('click', function() {
-					$('.getList').html('');
+					$('#getList').html('');
 					$(this).addClass('btn-tab-activity');
 					$('#onLine').removeClass('btn-tab-activity');
 					$('#offLine').removeClass('btn-tab-activity');
 					arr = [{
-						id: 'A',
+						bootid: '363620181216243',
+						bootname: '板鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 1,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.618139, 31.300408],
-						desc: '数据_1'
 					}, {
-						id: 'B',
+						bootid: '363620181216243',
+						bootname: '球鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 2,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616897, 31.300689],
-						desc: '数据_2'
 					}, {
-						id: 'C',
+						bootid: '363620181216243',
+						bootname: '草鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616228, 31.301633],
-						desc: '数据_3'
 					}, {
-						id: 'D',
+						bootid: '363620181216243',
+						bootname: '拖鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 5,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616237, 31.30232],
-						desc: '数据_3'
 					}, {
-						id: 'E',
+						bootid: '363620181216243',
+						bootname: '高跟鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 2,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616188, 31.302815],
-						desc: '数据_3'
 					}, {
-						id: 'F',
+						bootid: '3636201812162431',
+						bootname: '增高鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 4,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.61567, 31.302494],
-						desc: '数据_3'
 					}, {
-						id: 'g',
+						bootid: '3636201812162431',
+						bootname: '布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 1,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.615276, 31.301696],
-						desc: '数据_3'
 					}, {
-						id: 'H',
+						bootid: '1363620181216243',
+						bootname: '帆布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.615171, 31.300674],
-						desc: '数据_3'
 					}]
-					//				setSpot();
-					setListAddress();
+					transform(arr);
 					markerList.render(arr);
 				})
 
 				//在线
 				$('#onLine').on('click', function() {
-					$('.getList').html('');
+					$('#getList').html('');
 					$(this).addClass('btn-tab-activity');
 					$('#all').removeClass('btn-tab-activity');
 					$('#offLine').removeClass('btn-tab-activity');
 					arr = [{
-						id: 'A',
+						bootid: '363620181216243',
+						bootname: '板鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 1,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.618139, 31.300408],
-						desc: '数据_1'
 					}, {
-						id: 'B',
+						bootid: '363620181216243',
+						bootname: '球鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 2,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616897, 31.300689],
-						desc: '数据_2'
 					}, {
-						id: 'C',
+						bootid: '363620181216243',
+						bootname: '草鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.616228, 31.301633],
-						desc: '数据_3'
 					}, {
-						id: 'H',
+						bootid: '1363620181216243',
+						bootname: '帆布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.615171, 31.300674],
-						desc: '数据_3'
 					}]
-					//				setSpot();
-					setListAddress();
+					transform(arr);
 					markerList.render(arr);
 				})
 
 				//离线
 				$('#offLine').on('click', function() {
-					$('.getList').html('');
+					$('#getList').html('');
 					$(this).addClass('btn-tab-activity');
 					$('#onLine').removeClass('btn-tab-activity');
 					$('#all').removeClass('btn-tab-activity');
 					arr = [{
-						id: 'A',
-						position: [120.618139, 31.300408],
-						desc: '数据_1'
+						bootid: '3636201812162431',
+						bootname: '布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 1,
+						updatetime: '2019-03-17 17:17:53',
+						position: [120.615276, 31.301696],
 					}, {
-						id: 'B',
-						position: [120.616897, 31.300689],
-						desc: '数据_2'
-					}, {
-						id: 'H',
+						bootid: '1363620181216243',
+						bootname: '帆布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
 						position: [120.615171, 31.300674],
-						desc: '数据_3'
 					}]
 
-					//				setSpot();
-					setListAddress();
+					transform(arr);
 					markerList.render(arr);
 				})
 
 				//搜索
 				$('#search').on('click', function() {
-					//				$('.getList').html('');
-					//				$('#all').addClass('btn-tab-activity');
-					//				$('#onLine').removeClass('btn-tab-activity');
-					//				$('#offLine').removeClass('btn-tab-activity');
-					//				arr = [
-					//					[120.616237, 31.30232],
-					//					[120.616188, 31.302815],
-					//					[120.615171, 31.300674]
-					//				]
-					//				setSpot();
-					//				setListAddress();
-
+					$('#getList').html('');
+					$(this).addClass('btn-tab-activity');
+					$('#onLine').removeClass('btn-tab-activity');
+					$('#all').removeClass('btn-tab-activity');
+					arr = [{
+						bootid: '363620181216243',
+						bootname: '板鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 0,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 1,
+						updatetime: '2019-03-17 17:17:53',
+						position: [120.618139, 31.300408],
+					}, {
+						bootid: '1363620181216243',
+						bootname: '帆布鞋',
+						stationid: '铁鞋所在站id',
+						bootdeviceid: '铁鞋设备id',
+						onlinestate: 1,
+						uploadmode: 'WIFI',
+						batteryvoumn: '95%',
+						signalintensity: 3,
+						updatetime: '2019-03-17 17:17:53',
+						position: [120.615171, 31.300674],
+					}]
+					transform(arr);
+					markerList.render(arr);
 				})
 			}
-
-			$(function() {
-				//				setListAddress();
-			})
-
-			//			var lnglatXY = []; //坐标
-			//			var address; //详细地址
-			//
-			//			var map = new AMap.Map("container", {
-			//				zoom: 9
-			//			});
-			//
-			//			var arr = [
-			//				[120.618139, 31.300408],
-			//				[120.616897, 31.300689],
-			//				[120.616228, 31.301633],
-			//				[120.616237, 31.30232],
-			//				[120.616188, 31.302815],
-			//				[120.61567, 31.302494],
-			//				[120.615276, 31.301696],
-			//				[120.615171, 31.300674]
-			//			]
-			//
-			//			//将点标注在地图上
-			//			function setSpot() {
-			//				var infoWindow = new AMap.InfoWindow({
-			//					offset: new AMap.Pixel(0, -30)
-			//				});
-			//				for(var i = 0, marker; i < arr.length; i++) {
-			//					var marker = new AMap.Marker({
-			//						position: arr[i],
-			//						map: map
-			//					});
-			//					lnglatXY = arr[i];
-			//				}
-			//			}
-			//
-			//将列表中的经纬度转换为详细地址
-			function setListAddress() {
-				for(var i = 0; i < arr.length; i++) {
-					lnglatXY = arr[i].position;
-					regeocoder();
-				}
-			}
-			//
-			//解析地址
-			function regeocoder() {
-				var geocoder = new AMap.Geocoder({
-					radius: 1000,
-					extensions: "all"
-				});
-				geocoder.getAddress(lnglatXY, function(status, result) {
-					if(status === 'complete' && result.info === 'OK') {
-						//						geocoder_CallBack(result);
-						$('#getList').append('<li><div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + result.regeocode.formattedAddress + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div></li>')
-					}
-				});
-				//				var marker = new AMap.Marker({ //加点
-				//					map: map,
-				//					position: lnglatXY
-				//				});
-				//				map.setFitView();
-				//				//点击坐标时
-				//				marker.on('click', function(e) {
-				//					openInfo(e);
-				//				});
-			}
-			//
-			//返回地址
-			//			function geocoder_CallBack(data) {
-			//				address = data.regeocode.formattedAddress; //返回地址描述
-			//				$('.getList').append('<div class="info"><div class="infoTitle"><span class="bootname">123456</span><span class="bootId">（363620181216414）</span></div><div class="result">' + address + '</div><div>(在线 /WIFI/16% //2019-03-18 13:05:39)</div></div>')
-			//			}
-
-			//在指定位置打开信息窗体
-			//			function openInfo(e) {
-			//				//构建信息窗体中显示的内容
-			//				var info = [];
-			//				info.push(address);
-			//
-			//				infoWindow = new AMap.InfoWindow({
-			//					offset: new AMap.Pixel(0, -30),
-			//					content: info.join("") //使用默认信息窗体框样式，显示信息内容
-			//				});
-			//				infoWindow.open(map, e.target.getPosition(), map.getCenter());
-			//			}
 
 			//隐藏
 			$('.close-icon').on('click', function() {
@@ -388,12 +504,6 @@
 			$('#quit').on('click', function() {
 				window.location.href = 'login.html';
 			})
-			//
-			//			//点击列表打开指定位置
-			//			$(document).on('click', '.info', function() {
-			//
-			//			})
-			//
 		</script>
 	</body>
 
