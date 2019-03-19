@@ -368,6 +368,7 @@
 				//在线
 				$('#onLine').on('click', function() {
 					$('#getList').html('');
+					$('.amap-ui-markerlist-list-ele').removeClass('info');
 					$(this).addClass('btn-tab-activity');
 					$('#all').removeClass('btn-tab-activity');
 					$('#offLine').removeClass('btn-tab-activity');
