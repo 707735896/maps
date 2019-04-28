@@ -59,6 +59,7 @@
 				signalintensity: 1,
 				updatetime: '2019-03-17 17:17:53',
 				position: [120.618139, 31.300408],
+				address:'苏州吴中区。'
 			}, {
 				bootid: '363620181216243',
 				bootname: '球鞋',
@@ -223,7 +224,7 @@
 						});
 					},
 					getInfoWindow: function(dataItem, context, recycledInfoWindow) {
-						var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.bootid %>）</span></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.bootdeviceid %>）</span><select class="<%- dataItem.bootdeviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
 						//MarkerList.utils.template支持underscore语法的模板
 						var content = MarkerList.utils.template(tpl, {
 							dataItem: dataItem,
@@ -241,8 +242,7 @@
 						});
 					},
 					getListElement: function(dataItem, context, recycledListElement) {
-						console.log(dataItem);
-						var tpl = '<div class="info"><div class="infoTitle"><span class="bootname"><%- dataItem.bootname %></span><span class="bootId">（<%- dataItem.bootid %>）</span></div><div class="result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						var tpl = '<div class="info"><div class="infoTitle"><span class="bootname"><%- dataItem.bootname %></span><span class="bootId">（<%- dataItem.bootdeviceid %>）</span></div><div class="result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvoumn %> /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
 						var content = MarkerList.utils.template(tpl, {
 							dataItem: dataItem,
 							dataIndex: context.index
@@ -363,12 +363,12 @@
 					}]
 					transform(arr);
 					markerList.render(arr);
+					$('.amap-ui-markerlist-list-ele').removeClass('info');
 				})
 
 				//在线
 				$('#onLine').on('click', function() {
 					$('#getList').html('');
-					$('.amap-ui-markerlist-list-ele').removeClass('info');
 					$(this).addClass('btn-tab-activity');
 					$('#all').removeClass('btn-tab-activity');
 					$('#offLine').removeClass('btn-tab-activity');
@@ -383,6 +383,7 @@
 						signalintensity: 1,
 						updatetime: '2019-03-17 17:17:53',
 						position: [120.618139, 31.300408],
+						address:'测试'
 					}, {
 						bootid: '363620181216243',
 						bootname: '球鞋',
@@ -417,8 +418,10 @@
 						updatetime: '2019-03-17 17:17:53',
 						position: [120.615171, 31.300674],
 					}]
+					
 					transform(arr);
 					markerList.render(arr);
+					$('.amap-ui-markerlist-list-ele').removeClass('info');
 				})
 
 				//离线
@@ -453,6 +456,7 @@
 
 					transform(arr);
 					markerList.render(arr);
+					$('.amap-ui-markerlist-list-ele').removeClass('info');
 				})
 
 				//搜索
@@ -486,6 +490,7 @@
 					}]
 					transform(arr);
 					markerList.render(arr);
+					$('.amap-ui-markerlist-list-ele').removeClass('info');
 				})
 			}
 
@@ -505,6 +510,11 @@
 			$('#quit').on('click', function() {
 				window.location.href = 'login.html';
 			})
+			
+			$('body').on('change','select',function(){
+				console.log($(this).val())
+			})
+			
 		</script>
 	</body>
 
