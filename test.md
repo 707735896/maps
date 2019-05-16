@@ -102,7 +102,7 @@
 				"bootname": "兰州站1号铁鞋",
 				"stationid": 2,
 				"deviceid": "sbb512575",
-				"longtitude": 103.69,
+				"longtitude": 103.689785,
 				"latitude": 36.1156,
 				"onlinestate": 1,
 				"uploadmode": "GPRS",
@@ -136,5 +136,9 @@
 				"signalintensity": 5,
 				"updatetime": "2019-05-07T02:17:01.000+0000",
 				"uploadinterval": 300
+			}]
+			
+			[{
+			"id":1,"bootname":"兰州站1号铁鞋","stationid":2,"deviceid":"sbb512575","longtitude":103.69,"latitude":36.1156,"onlinestate":1,"uploadmode":"GPRS","batteryvolumn":85,"signalintensity":5,"updatetime":"2019-05-16T02:56:00.000+0000","uploadinterval":10,"locations":"103.69,36.1156"},{"id":2,"bootname":"兰州站2号铁鞋","stationid":2,"deviceid":"usqq12346","longtitude":103.69,"latitude":36.1156,"onlinestate":1,"uploadmode":"GPRS","batteryvolumn":65,"signalintensity":5,"updatetime":"2019-05-07T02:10:34.000+0000","uploadinterval":300,"locations":"103.69,36.1156"},{"id":3,"bootname":"兰州站3号铁鞋","stationid":2,"deviceid":"duset175ae","longtitude":103.69,"latitude":36.1156,"onlinestate":1,"uploadmode":"GPRS","batteryvolumn":65,"signalintensity":5,"updatetime":"2019-05-07T02:17:01.000+0000","uploadinterval":300,"locations":"103.69,36.1156"
 			}]
 https://lbs.amap.com/api/webservice/guide/api/georegeo#regeo  逆编码接口地址

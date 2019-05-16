@@ -218,7 +218,9 @@ li {
 	padding: 10px 0;
 }
 
-.windowInfo {}
+.windowInfo {
+	width: 350px;
+}
 
 .infoWindow-name {
 	font-weight: bold;
