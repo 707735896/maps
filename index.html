@@ -40,342 +40,352 @@
 		</div>
 		<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 		<script type="text/javascript">
-			$(function() {
-				if(sessionStorage.getItem('userName')) {
-					$('.userName').text(sessionStorage.getItem('userName'))
-				} else {
-					window.location.href = 'login.html'
-				}
-				var arr = [];
+			if(sessionStorage.getItem('userName')) {
+				$('.userName').text(sessionStorage.getItem('userName'))
+			} else {
+				window.location.href = 'login.html'
+			}
+			var arr = [];
 
-				//全部
+			//全部
+			$.ajax({
+				type: "post",
+				dataType: 'json',
+				async: false,
+				url: 'http://47.105.222.116:8088/boot/getBootInfo',
+				success: function(res) {
+					arr = res.BootsInfo;
+					$('.allnum').text(res.BootsInfo.length);
+					var zx = 0;
+					$.each(res.BootsInfo, function(i, value) {
+						if(value.onlinestate == 1) {
+							zx++;
+						}
+					});
+					$('.zxnum').text(zx);
+					$('.lxnum').text(res.BootsInfo.length - zx);
+				}
+			});
+
+			//创建地图
+			var map = new AMap.Map('container', {
+				zoom: 9
+			});
+
+			var lnglatXY;
+			var m2;
+
+			transform(arr);
+
+			function transform(arr) {
+				$.each(arr, function(n, value) {
+					var d = new Date(value.updatetime);
+
+					var h = Math.floor(d.getHours()) < 10 ? '0' + Math.floor(d.getHours()) : Math.floor(d.getHours());
+					var m = Math.floor(d.getMinutes()) < 10 ? '0' + Math.floor(d.getMinutes()) : Math.floor(d.getMinutes());
+					var s = Math.floor(d.getSeconds()) < 10 ? '0' + Math.floor(d.getSeconds()) : Math.floor(d.getSeconds());
+
+					var times = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + h + ':' + m + ':' + s;
+
+					value.updatetime = times;
+
+					if(value.signalintensity == 1) {
+						value.signalintensity = 'img/Signal-1.png'
+					}
+					if(value.signalintensity == 2) {
+						value.signalintensity = 'img/Signal-2.png'
+					}
+					if(value.signalintensity == 3) {
+						value.signalintensity = 'img/Signal-3.png'
+					}
+					if(value.signalintensity == 4) {
+						value.signalintensity = 'img/Signal-4.png'
+					}
+					if(value.signalintensity == 5) {
+						value.signalintensity = 'img/Signal-5.png'
+					}
+
+					if(value.onlinestate == 0) {
+						value.onlinestate = '离线';
+					}
+
+					if(value.onlinestate == 1) {
+						value.onlinestate = '在线';
+					}
+
+					value.locations = value.locations.toString().split(',').map(Number);
+
+					//						var geocoder = new AMap.Geocoder({
+					//							radius: 1000,
+					//							extensions: "all"
+					//						});
+					//
+					//						geocoder.getAddress(value.locations, function(status, result) {
+					//							if(status === 'complete' && result.info === 'OK') {
+					//								value.address = result.regeocode.formattedAddress;
+					//							}
+					//						});
+
+				});
+			}
+			var markerList;
+			AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
+				initPage(MarkerList);
+			});
+
+			function initPage(MarkerList) {
+
+				$.each(arr, function(n, value) {
+					var d = new Date(value.updatetime);
+
+					var h = Math.floor(d.getHours()) < 10 ? '0' + Math.floor(d.getHours()) : Math.floor(d.getHours());
+					var m = Math.floor(d.getMinutes()) < 10 ? '0' + Math.floor(d.getMinutes()) : Math.floor(d.getMinutes());
+					var s = Math.floor(d.getSeconds()) < 10 ? '0' + Math.floor(d.getSeconds()) : Math.floor(d.getSeconds());
+
+					var times = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + h + ':' + m + ':' + s;
+					
+					value.updatetime = times;
+
+					if(value.signalintensity == 1) {
+						value.signalintensity = 'img/Signal-1.png'
+					}
+					if(value.signalintensity == 2) {
+						value.signalintensity = 'img/Signal-2.png'
+					}
+					if(value.signalintensity == 3) {
+						value.signalintensity = 'img/Signal-3.png'
+					}
+					if(value.signalintensity == 4) {
+						value.signalintensity = 'img/Signal-4.png'
+					}
+					if(value.signalintensity == 5) {
+						value.signalintensity = 'img/Signal-5.png'
+					}
+
+					if(value.onlinestate == 0) {
+						value.onlinestate = '离线';
+					}
+
+					if(value.onlinestate == 1) {
+						value.onlinestate = '在线';
+					}
+
+					value.locations = value.locations.toString().split(',').map(Number);
+					//
+					//						var geocoder = new AMap.Geocoder({
+					//							radius: 1000,
+					//							extensions: "all"
+					//						});
+					//
+					//						geocoder.getAddress(value.locations, function(status, result) {
+					//							if(status === 'complete' && result.info === 'OK') {
+					//								value.address = result.regeocode.formattedAddress;
+					//							}
+					//						});
+
+				});
+
+				//创建一个实例
+				var markerList = new MarkerList({
+					//关联的map对象
+					map: map,
+					//列表的dom容器的节点或者id, 用于放置getListElement返回的内容
+					listContainer: 'getList',
+					//选中状态（通过点击列表或者marker）时在Marker和列表节点上添加的class，可以借此编写css控制选中时的展示效果
+					selectedClassNames: 'my-active',
+					//需要监听的列表节点事件
+					listElementEvents: ['click', 'mouseenter', 'mouseleave'],
+					//需要监听的marker事件
+					markerEvents: ['click', 'mouseover', 'mouseout'],
+					getDataId: function(dataItem, index) {
+						//返回数据项的Id
+						return dataItem.id;
+					},
+					getPosition: function(dataItem) {
+						//返回数据项的经纬度，AMap.LngLat实例或者经纬度数组
+						return dataItem.locations;
+					},
+					getMarker: function(dataItem, context, recycledMarker) {
+						var content = '标注: ' + (context.index + 1) + '',
+							label = {
+								offset: new AMap.Pixel(16, 18),
+								//								content: content
+							};
+
+						if(recycledMarker) {
+							//存在可回收利用的marker,直接setLabel返回
+							recycledMarker.setLabel(label);
+							return recycledMarker;
+						}
+						//返回一个新的Marker
+						return new AMap.Marker({
+							label: label
+						});
+					},
+					getInfoWindow: function(dataItem, context, recycledInfoWindow) {
+						if(dataItem.uploadinterval == 1) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1" selected>1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 5) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5" selected>5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 10) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10" selected>10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 30) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30" selected>30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 60) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60" selected>1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 120) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120" selected>2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else
+						if(dataItem.uploadinterval == 300) {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300" selected>5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						} else {
+							var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						}
+						//MarkerList.utils.template支持underscore语法的模板
+						var content = MarkerList.utils.template(tpl, {
+							dataItem: dataItem,
+							dataIndex: context.index
+						});
+						if(recycledInfoWindow) {
+							//存在可回收利用的infoWindow, 直接setContent返回
+							recycledInfoWindow.setContent(content);
+							return recycledInfoWindow;
+						}
+						//返回一个新的InfoWindow
+						return new AMap.InfoWindow({
+							offset: new AMap.Pixel(0, -23),
+							content: content
+						});
+					},
+					getListElement: function(dataItem, context, recycledListElement) {
+						var tpl = '<div class="info"><div class="infoTitle"><span class="bootname"><%- dataItem.bootname %></span><span class="bootId">(<%- dataItem.deviceid %>)</span></div><div class="result"><%- dataItem.formattedAddress %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
+						var content = MarkerList.utils.template(tpl, {
+							dataItem: dataItem,
+							dataIndex: context.index
+						});
+						if(recycledListElement) {
+							//存在可回收利用的listElement, 直接更新内容返回
+							recycledListElement.innerHTML = content;
+							return recycledListElement;
+						}
+						//返回一段html，MarkerList将利用此html构建一个新的dom节点
+						return content;
+					}
+				});
+
+				//监听选中改变
+				markerList.on('selectedChanged', function(event, info) {});
+
+				//监听Marker和ListElement上的点击，详见markerEvents，listElementEvents
+				markerList.on('markerClick listElementClick', function(event, record) {});
+
+				//绘制数据源
+				markerList.render(arr);
+
+			}
+
+			//全部
+			$('#all').on('click', function() {
+				$('#getList').html('');
+				$(this).addClass('btn-tab-activity');
+				$('#onLine').removeClass('btn-tab-activity');
+				$('#offLine').removeClass('btn-tab-activity');
 				$.ajax({
 					type: "post",
 					dataType: 'json',
 					async: false,
-					url: 'http://20.8.0.11:8088/boot/getBootInfo',
+					url: 'http://47.105.222.116:8088/boot/getBootInfo',
 					success: function(res) {
 						arr = res.BootsInfo;
-						$('.allnum').text(res.BootsInfo.length);
-						var zx = 0;
-						$.each(res.BootsInfo, function(i, value) {
-							if(value.onlinestate == 1) {
-								zx++;
-							}
-						});
-						$('.zxnum').text(zx);
-						$('.lxnum').text(res.BootsInfo.length - zx);
 					}
 				});
-
-				//创建地图
-				var map = new AMap.Map('container', {
-					zoom: 9
-				});
-
-				var lnglatXY;
-				var m2;
-
-				transform(arr);
-
-				function transform(arr) {
-					$.each(arr, function(n, value) {
-						var d = new Date(value.updatetime);
-						var times = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-						value.updatetime = times;
-
-						if(value.signalintensity == 1) {
-							value.signalintensity = 'img/Signal-1.png'
-						}
-						if(value.signalintensity == 2) {
-							value.signalintensity = 'img/Signal-2.png'
-						}
-						if(value.signalintensity == 3) {
-							value.signalintensity = 'img/Signal-3.png'
-						}
-						if(value.signalintensity == 4) {
-							value.signalintensity = 'img/Signal-4.png'
-						}
-						if(value.signalintensity == 5) {
-							value.signalintensity = 'img/Signal-5.png'
-						}
-
-						if(value.onlinestate == 0) {
-							value.onlinestate = '离线';
-						}
-
-						if(value.onlinestate == 1) {
-							value.onlinestate = '在线';
-						}
-
-						value.locations = value.locations.toString().split(',').map(Number);
-
-						var geocoder = new AMap.Geocoder({
-							radius: 1000,
-							extensions: "all"
-						});
-
-						geocoder.getAddress(value.locations, function(status, result) {
-							if(status === 'complete' && result.info === 'OK') {
-								value.address = result.regeocode.formattedAddress;
-							}
-						});
-
-					});
-				}
-				var markerList;
 				AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
 					initPage(MarkerList);
 				});
 
-				function initPage(MarkerList) {
+				$('.amap-ui-markerlist-list-ele').removeClass('info');
+			})
 
-					$.each(arr, function(n, value) {
-						var d = new Date(value.updatetime);
-						var times = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-						value.updatetime = times;
-
-						if(value.signalintensity == 1) {
-							value.signalintensity = 'img/Signal-1.png'
-						}
-						if(value.signalintensity == 2) {
-							value.signalintensity = 'img/Signal-2.png'
-						}
-						if(value.signalintensity == 3) {
-							value.signalintensity = 'img/Signal-3.png'
-						}
-						if(value.signalintensity == 4) {
-							value.signalintensity = 'img/Signal-4.png'
-						}
-						if(value.signalintensity == 5) {
-							value.signalintensity = 'img/Signal-5.png'
-						}
-
-						if(value.onlinestate == 0) {
-							value.onlinestate = '离线';
-						}
-
-						if(value.onlinestate == 1) {
-							value.onlinestate = '在线';
-						}
-
-						value.locations = value.locations.toString().split(',').map(Number);
-
-						var geocoder = new AMap.Geocoder({
-							radius: 1000,
-							extensions: "all"
-						});
-
-						geocoder.getAddress(value.locations, function(status, result) {
-							if(status === 'complete' && result.info === 'OK') {
-								value.address = result.regeocode.formattedAddress;
-							}
-						});
-
-					});
-
-					//创建一个实例
-					var markerList = new MarkerList({
-						//关联的map对象
-						map: map,
-						//列表的dom容器的节点或者id, 用于放置getListElement返回的内容
-						listContainer: 'getList',
-						//选中状态（通过点击列表或者marker）时在Marker和列表节点上添加的class，可以借此编写css控制选中时的展示效果
-						selectedClassNames: 'my-active',
-						//需要监听的列表节点事件
-						listElementEvents: ['click', 'mouseenter', 'mouseleave'],
-						//需要监听的marker事件
-						markerEvents: ['click', 'mouseover', 'mouseout'],
-						getDataId: function(dataItem, index) {
-							//返回数据项的Id
-							return dataItem.id;
-						},
-						getPosition: function(dataItem) {
-							//返回数据项的经纬度，AMap.LngLat实例或者经纬度数组
-							return dataItem.locations;
-						},
-						getMarker: function(dataItem, context, recycledMarker) {
-							var content = '标注: ' + (context.index + 1) + '',
-								label = {
-									offset: new AMap.Pixel(16, 18),
-									//								content: content
-								};
-
-							if(recycledMarker) {
-								//存在可回收利用的marker,直接setLabel返回
-								recycledMarker.setLabel(label);
-								return recycledMarker;
-							}
-							//返回一个新的Marker
-							return new AMap.Marker({
-								label: label
-							});
-						},
-						getInfoWindow: function(dataItem, context, recycledInfoWindow) {
-							if(dataItem.uploadinterval == 1) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1" selected>1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 5) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5" selected>5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 10) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10" selected>10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 30) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30" selected>30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 60) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60" selected>1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 120) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120" selected>2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else
-							if(dataItem.uploadinterval == 300) {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300" selected>5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							} else {
-								var tpl = '<div class="windowInfo"><div class="infoTitle"><span class="infoWindow-name"><%- dataItem.bootname %></span><span class="infoWindow-name">（<%- dataItem.deviceid %>）</span><select class="test <%- dataItem.deviceid %>" style="height:24px;font-size:16px;"><option value="1">1秒</option><option value="5">5秒</option><option value="10">10秒</option><option value="30">30秒</option><option value="60">1分钟</option><option value="120">2分钟</option><option value="300">5分钟</option></select></div><div class="infoWindow-result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							}
-							//MarkerList.utils.template支持underscore语法的模板
-							var content = MarkerList.utils.template(tpl, {
-								dataItem: dataItem,
-								dataIndex: context.index
-							});
-							if(recycledInfoWindow) {
-								//存在可回收利用的infoWindow, 直接setContent返回
-								recycledInfoWindow.setContent(content);
-								return recycledInfoWindow;
-							}
-							//返回一个新的InfoWindow
-							return new AMap.InfoWindow({
-								offset: new AMap.Pixel(0, -23),
-								content: content
-							});
-						},
-						getListElement: function(dataItem, context, recycledListElement) {
-							var tpl = '<div class="info"><div class="infoTitle"><span class="bootname"><%- dataItem.bootname %></span><span class="bootId">(<%- dataItem.deviceid %>)</span></div><div class="result"><%- dataItem.address %></div><div class="infoWindow-other">(<%- dataItem.onlinestate %> /<%- dataItem.uploadmode %> /<%- dataItem.batteryvolumn %>% /<img src="<%- dataItem.signalintensity %>"/>/<%- dataItem.updatetime %>)</div></div>';
-							var content = MarkerList.utils.template(tpl, {
-								dataItem: dataItem,
-								dataIndex: context.index
-							});
-							if(recycledListElement) {
-								//存在可回收利用的listElement, 直接更新内容返回
-								recycledListElement.innerHTML = content;
-								return recycledListElement;
-							}
-							//返回一段html，MarkerList将利用此html构建一个新的dom节点
-							return content;
-						}
-					});
-
-					//监听选中改变
-					markerList.on('selectedChanged', function(event, info) {});
-
-					//监听Marker和ListElement上的点击，详见markerEvents，listElementEvents
-					markerList.on('markerClick listElementClick', function(event, record) {});
-
-					//绘制数据源
-					markerList.render(arr);
-
-				}
-
-				//全部
-				$('#all').on('click', function() {
-					$('#getList').html('');
-					$(this).addClass('btn-tab-activity');
-					$('#onLine').removeClass('btn-tab-activity');
-					$('#offLine').removeClass('btn-tab-activity');
-					$.ajax({
-						type: "post",
-						dataType: 'json',
-						async: false,
-						url: 'http://20.8.0.11:8088/boot/getBootInfo',
-						success: function(res) {
-							arr = res.BootsInfo;
-						}
-					});
-					AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
-						initPage(MarkerList);
-					});
-
-					$('.amap-ui-markerlist-list-ele').removeClass('info');
-				})
-
-				//在线
-				$('#onLine').on('click', function() {
-					$('#getList').html('');
-					$(this).addClass('btn-tab-activity');
-					$('#all').removeClass('btn-tab-activity');
-					$('#offLine').removeClass('btn-tab-activity');
-					$.ajax({
-						type: "post",
-						dataType: 'json',
-						async: false,
-						data: {
-							'onlinestate': 1
-						},
-						url: 'http://20.8.0.11:8088/boot/getBootInfo',
-						success: function(res) {
-							arr = res.BootsInfo;
-						}
-					});
-					AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
-						initPage(MarkerList);
-					});
-
-					$('.amap-ui-markerlist-list-ele').removeClass('info');
-				})
-
-				//离线
-				$('#offLine').on('click', function() {
-					$('#getList').html('');
-					$(this).addClass('btn-tab-activity');
-					$('#onLine').removeClass('btn-tab-activity');
-					$('#all').removeClass('btn-tab-activity');
-					$.ajax({
-						type: "post",
-						dataType: 'json',
-						async: false,
-						data: {
-							'onlinestate': 0
-						},
-						url: 'http://20.8.0.11:8088/boot/getBootInfo',
-						success: function(res) {
-							arr = res.BootsInfo;
-						}
-					});
-					AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
-						initPage(MarkerList);
-					});
-
-					$('.amap-ui-markerlist-list-ele').removeClass('info');
-				})
-
-				//搜索
-				$('#search').on('click', function() {
-					var data = {
-						'bootname': $('#search_val').val(),
-						'deviceid': $('#search_val').val()
+			//在线
+			$('#onLine').on('click', function() {
+				$('#getList').html('');
+				$(this).addClass('btn-tab-activity');
+				$('#all').removeClass('btn-tab-activity');
+				$('#offLine').removeClass('btn-tab-activity');
+				$.ajax({
+					type: "post",
+					dataType: 'json',
+					async: false,
+					data: {
+						'onlinestate': 1
+					},
+					url: 'http://47.105.222.116:8088/boot/getBootInfo',
+					success: function(res) {
+						arr = res.BootsInfo;
 					}
-					$.ajax({
-						type: "post",
-						data: data,
-						dataType: 'json',
-						async: false,
-						url: 'http://20.8.0.11:8088/boot/getBootInfo',
-						success: function(res) {
-							arr = res.BootsInfo;
-							$('.allnum').text(res.BootsInfo.length)
-						}
-					});
-					$('#getList').html('');
-					$(this).addClass('btn-tab-activity');
-					$('#onLine').removeClass('btn-tab-activity');
-					$('#all').removeClass('btn-tab-activity');
-					AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
-						initPage(MarkerList);
-					});
-					$('.amap-ui-markerlist-list-ele').removeClass('info');
-				})
+				});
+				AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
+					initPage(MarkerList);
+				});
+
+				$('.amap-ui-markerlist-list-ele').removeClass('info');
+			})
+
+			//离线
+			$('#offLine').on('click', function() {
+				$('#getList').html('');
+				$(this).addClass('btn-tab-activity');
+				$('#onLine').removeClass('btn-tab-activity');
+				$('#all').removeClass('btn-tab-activity');
+				$.ajax({
+					type: "post",
+					dataType: 'json',
+					async: false,
+					data: {
+						'onlinestate': 0
+					},
+					url: 'http://47.105.222.116:8088/boot/getBootInfo',
+					success: function(res) {
+						arr = res.BootsInfo;
+					}
+				});
+				AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
+					initPage(MarkerList);
+				});
+
+				$('.amap-ui-markerlist-list-ele').removeClass('info');
+			})
+
+			//搜索
+			$('#search').on('click', function() {
+				var data = {
+					'bootname': $('#search_val').val(),
+					'deviceid': $('#search_val').val()
+				}
+				$.ajax({
+					type: "post",
+					data: data,
+					dataType: 'json',
+					async: false,
+					url: 'http://47.105.222.116:8088/boot/getBootInfo',
+					success: function(res) {
+						arr = res.BootsInfo;
+//						$('.allnum').text(res.BootsInfo.length)
+					}
+				});
+				$('#getList').html('');
+				$(this).addClass('btn-tab-activity');
+				$('#onLine').removeClass('btn-tab-activity');
+				$('#all').removeClass('btn-tab-activity');
+				AMapUI.loadUI(['misc/MarkerList'], function(MarkerList) {
+					initPage(MarkerList);
+				});
+				$('.amap-ui-markerlist-list-ele').removeClass('info');
 			})
 
 			//隐藏
@@ -407,7 +417,7 @@
 					type: "post",
 					data: data,
 					dataType: 'json',
-					url: 'http://20.8.0.11:8088/boot/updateBootInfo',
+					url: 'http://47.105.222.116:8088/boot/updateBootInfo',
 					success: function(res) {
 						alert(res.msg);
 					}
