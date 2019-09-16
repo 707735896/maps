@@ -144,7 +144,7 @@ li {
 }
 
 .infoList {
-	display: block;
+	display: none;
 	position: fixed;
 	margin: 10px;
 	top: 100px;
@@ -194,10 +194,11 @@ li {
 	z-index: 2;
 	background: rgb(60, 141, 188);
 	color: rgb(255, 255, 255);
+	display: none;
 }
 
 .show-icon {
-	display: none;
+	display: block;
 	cursor: pointer;
 	position: absolute;
 	top: 122px;
@@ -219,7 +220,7 @@ li {
 }
 
 .windowInfo {
-	width: 350px;
+	width: 380px;
 }
 
 .infoWindow-name {
@@ -236,6 +237,14 @@ li {
 	font-size: 14px;
 }
 
+.isOnline {
+	color: green;
+}
+
+.isOffline {
+	color: red;
+}
+
 .infoWindow-other img {
 	margin-bottom: 4px;
 	height: 22px;
@@ -247,6 +256,10 @@ li {
 }
 
 .info:hover {
+	background: #E1E1E1;
+}
+
+.selected {
 	background: #E1E1E1;
 }
 
@@ -284,4 +297,8 @@ button {
 
 #getList .my-active {
 	background: #E1E1E1;
+}
+
+.amap-marker-content {
+	opacity: 0;
 }
